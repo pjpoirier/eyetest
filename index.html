@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Windows RGB Contrast Finder — Eye Condition Presets</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/dist/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg-sec: #f5f5f5;
+    --bg-tert: #eeeeee;
+    --text: #111111;
+    --text-sec: #555555;
+    --text-hint: #888888;
+    --border: rgba(0,0,0,0.12);
+    --border-med: rgba(0,0,0,0.22);
+    --border-str: rgba(0,0,0,0.35);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --success-bg: #eaf3de;
+    --success-text: #27500a;
+    --danger-bg: #fcebeb;
+    --danger-text: #791f1f;
+    --info-bg: #e6f1fb;
+    --info-text: #0c447c;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1a1a;
+      --bg-sec: #242424;
+      --bg-tert: #2e2e2e;
+      --text: #f0f0f0;
+      --text-sec: #aaaaaa;
+      --text-hint: #666666;
+      --border: rgba(255,255,255,0.1);
+      --border-med: rgba(255,255,255,0.2);
+      --border-str: rgba(255,255,255,0.32);
+      --success-bg: #173404;
+      --success-text: #c0dd97;
+      --danger-bg: #501313;
+      --danger-text: #f09595;
+      --info-bg: #042c53;
+      --info-text: #b5d4f4;
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg-tert);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  header {
+    margin-bottom: 2rem;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  header p {
+    font-size: 14px;
+    color: var(--text-sec);
+  }
+
+  .sec-label {
+    font-size: 11px;
+    color: var(--text-sec);
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin: 0 0 8px;
+  }
+
+  .card {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .card h3 {
+    font-size: 15px;
+    font-weight: 500;
+    margin: 0 0 12px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card h3 i { font-size: 18px; color: var(--text-sec); }
+
+  select, input[type=text] {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-family: inherit;
+    border: 0.5px solid var(--border-med);
+    border-radius: var(--radius-md);
+    background: var(--bg-sec);
+    color: var(--text);
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+  }
+  select:focus, input[type=text]:focus {
+    box-shadow: 0 0 0 2px var(--info-bg);
+    border-color: var(--info-text);
+  }
+
+  .condition-note {
+    font-size: 13px;
+    color: var(--text-sec);
+    line-height: 1.65;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 0.5px solid var(--border);
+    display: none;
+  }
+  .condition-note strong { color: var(--text); font-weight: 500; }
+
+  .preset-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .cpill {
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    border: 0.5px solid var(--border-med);
+    background: var(--bg-sec);
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: inherit;
+    transition: border-color .15s, background .15s;
+  }
+  .cpill:hover { border-color: var(--border-str); }
+  .cpill.active { border-color: var(--border-str); background: var(--bg); font-weight: 500; }
+  .cpill-swatch {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+  }
+  .cpill-ratio { color: var(--text-hint); font-size: 11px; }
+
+  .preview-box {
+    width: 100%;
+    min-height: 110px;
+    border-radius: var(--radius-lg);
+    border: 0.5px solid var(--border-med);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: background .2s, color .2s;
+  }
+  .preview-text { font-size: 22px; font-weight: 500; text-align: center; transition: color .2s; }
+  .preview-small { font-size: 14px; margin-top: 6px; text-align: center; transition: color .2s; }
+
+  .ratio-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .ratio-badge { font-size: 32px; font-weight: 500; min-width: 90px; color: var(--text); }
+  .badge-pill {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    margin: 2px 2px 2px 0;
+    display: inline-block;
+  }
+  .pass { background: var(--success-bg); color: var(--success-text); }
+  .fail { background: var(--danger-bg); color: var(--danger-text); }
+  .ratio-desc-label { font-size: 13px; color: var(--text-sec); line-height: 1.5; }
+  .ratio-desc-label span { color: var(--text); font-weight: 500; display: block; }
+
+  .cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 1.5rem;
+  }
+  @media (max-width: 480px) { .cols { grid-template-columns: 1fr; } }
+
+  .swatch-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .swatch {
+    width: 44px; height: 44px;
+    border-radius: var(--radius-md);
+    border: 0.5px solid var(--border-med);
+    flex-shrink: 0;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .swatch input[type=color] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+  .hex-input {
+    flex: 1;
+    padding: 6px 10px;
+    font-size: 13px;
+    font-family: 'Courier New', monospace;
+    border: 0.5px solid var(--border-med);
+    border-radius: var(--radius-md);
+    background: var(--bg-sec);
+    color: var(--text);
+    outline: none;
+  }
+  .hex-input:focus { box-shadow: 0 0 0 2px var(--info-bg); border-color: var(--info-text); }
+
+  .slider-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .ch-label { font-size: 12px; color: var(--text-sec); width: 14px; font-weight: 500; }
+  input[type=range] {
+    flex: 1;
+    height: 4px;
+    appearance: none;
+    -webkit-appearance: none;
+    background: var(--border-med);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--text);
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 0 1px var(--border-med);
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--text);
+    border: 2px solid var(--bg);
+  }
+  .ch-val { font-size: 12px; font-family: monospace; min-width: 28px; text-align: right; color: var(--text-sec); }
+
+  .levels-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .level-card {
+    flex: 1;
+    min-width: 130px;
+    background: var(--bg-sec);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+  }
+  .lvl-title { font-size: 12px; font-weight: 500; color: var(--text-sec); margin-bottom: 4px; }
+  .lvl-req { font-size: 13px; color: var(--text); margin-bottom: 4px; }
+  .lvl-status { font-size: 12px; font-weight: 500; }
+
+  .win-tip {
+    background: var(--bg-sec);
+    border-left: 3px solid var(--border-str);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--text-sec);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+  .win-tip strong { color: var(--text); font-weight: 500; }
+
+  .combo-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 0.5rem; }
+  .combo-row label { font-size: 13px; color: var(--text-sec); }
+  #colorCombo { font-size: 13px; font-family: monospace; color: var(--text); }
+  .copy-btn {
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: var(--radius-md);
+    border: 0.5px solid var(--border-med);
+    background: var(--bg-sec);
+    color: var(--text-sec);
+    cursor: pointer;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: color .15s, border-color .15s;
+  }
+  .copy-btn:hover { color: var(--text); border-color: var(--border-str); }
+
+  footer {
+    margin-top: 2.5rem;
+    padding-top: 1rem;
+    border-top: 0.5px solid var(--border);
+    font-size: 12px;
+    color: var(--text-hint);
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1><i class="ti ti-eye" style="vertical-align:-3px;margin-right:6px;" aria-hidden="true"></i>Windows RGB Contrast Finder</h1>
+    <p>Find the best text and background color contrast for your vision needs — then apply it in Windows Accessibility settings.</p>
+  </header>
+
+  <div class="sec-label">eye condition presets</div>
+  <div class="card">
+    <h3><i class="ti ti-eye-check" aria-hidden="true"></i>select your condition</h3>
+    <select id="conditionSelect" aria-label="Select eye condition">
+      <option value="">— choose a condition —</option>
+      <optgroup label="Low vision">
+        <option value="low_vision_general">Low vision (general)</option>
+        <option value="legal_blind">Legal blindness / severe low vision</option>
+        <option value="macular_degen">Macular degeneration (AMD)</option>
+        <option value="glaucoma">Glaucoma</option>
+        <option value="diabetic_retino">Diabetic retinopathy</option>
+        <option value="cataracts">Cataracts</option>
+        <option value="nystagmus">Nystagmus</option>
+      </optgroup>
+      <optgroup label="Color vision deficiency">
+        <option value="protanopia">Protanopia (red-blind)</option>
+        <option value="deuteranopia">Deuteranopia (green-blind)</option>
+        <option value="tritanopia">Tritanopia (blue-blind)</option>
+        <option value="achromatopsia">Achromatopsia (total color blindness)</option>
+      </optgroup>
+      <optgroup label="Light sensitivity">
+        <option value="photophobia">Photophobia (light sensitivity)</option>
+        <option value="albinism">Albinism</option>
+        <option value="retinitis_pig">Retinitis pigmentosa</option>
+      </optgroup>
+      <optgroup label="Other">
+        <option value="hemianopia">Hemianopia (half-field vision loss)</option>
+        <option value="keratoconus">Keratoconus</option>
+      </optgroup>
+    </select>
+    <div id="conditionNote" class="condition-note"></div>
+    <div id="conditionPills" class="preset-pills"></div>
+  </div>
+
+  <div class="sec-label">live preview</div>
+  <div class="preview-box" id="previewBox">
+    <div>
+      <div class="preview-text" id="previewText">Sample text — how well can you read this?</div>
+      <div class="preview-small" id="previewSmall">Smaller body text and labels look like this.</div>
+    </div>
+  </div>
+
+  <div class="ratio-row">
+    <div class="ratio-badge" id="ratioDisplay">21.00:1</div>
+    <div id="pillsArea"></div>
+    <div class="ratio-desc-label">contrast ratio<br><span id="ratioDesc"></span></div>
+  </div>
+
+  <div class="cols">
+    <div class="card" style="margin-bottom:0;">
+      <h3><i class="ti ti-letter-t" aria-hidden="true"></i>text color</h3>
+      <div class="swatch-row">
+        <div class="swatch" id="fgSwatch" style="background:#FFFFFF;"><input type="color" id="fgPicker" value="#FFFFFF" aria-label="Pick text color"></div>
+        <input type="text" class="hex-input" id="fgHex" value="#FFFFFF" maxlength="7" aria-label="Text color hex value" placeholder="#FFFFFF">
+      </div>
+      <div class="slider-row"><span class="ch-label">R</span><input type="range" min="0" max="255" step="1" value="255" id="fgR" aria-label="Red channel"><span class="ch-val" id="fgRv">255</span></div>
+      <div class="slider-row"><span class="ch-label">G</span><input type="range" min="0" max="255" step="1" value="255" id="fgG" aria-label="Green channel"><span class="ch-val" id="fgGv">255</span></div>
+      <div class="slider-row"><span class="ch-label">B</span><input type="range" min="0" max="255" step="1" value="255" id="fgB" aria-label="Blue channel"><span class="ch-val" id="fgBv">255</span></div>
+    </div>
+    <div class="card" style="margin-bottom:0;">
+      <h3><i class="ti ti-layout-bottombar" aria-hidden="true"></i>background color</h3>
+      <div class="swatch-row">
+        <div class="swatch" id="bgSwatch" style="background:#000000;"><input type="color" id="bgPicker" value="#000000" aria-label="Pick background color"></div>
+        <input type="text" class="hex-input" id="bgHex" value="#000000" maxlength="7" aria-label="Background color hex value" placeholder="#000000">
+      </div>
+      <div class="slider-row"><span class="ch-label">R</span><input type="range" min="0" max="255" step="1" value="0" id="bgR" aria-label="Red channel"><span class="ch-val" id="bgRv">0</span></div>
+      <div class="slider-row"><span class="ch-label">G</span><input type="range" min="0" max="255" step="1" value="0" id="bgG" aria-label="Green channel"><span class="ch-val" id="bgGv">0</span></div>
+      <div class="slider-row"><span class="ch-label">B</span><input type="range" min="0" max="255" step="1" value="0" id="bgB" aria-label="Blue channel"><span class="ch-val" id="bgBv">0</span></div>
+    </div>
+  </div>
+  <div style="margin-bottom:1.5rem;"></div>
+
+  <div class="sec-label">wcag compliance levels</div>
+  <div class="levels-row" id="levelsRow"></div>
+
+  <div class="sec-label">apply to windows</div>
+  <div class="win-tip">
+    <strong>Contrast themes:</strong> Settings → Accessibility → Contrast themes — choose a theme and paste your hex colors to customize it.<br>
+    <strong>Color filters:</strong> Settings → Accessibility → Color filters — enable grayscale or color-blind filter modes.<br>
+    <strong>Text size:</strong> Settings → Accessibility → Text size — increase the system-wide font size for better readability.
+  </div>
+  <div class="combo-row">
+    <label>your combination:</label>
+    <code id="colorCombo"></code>
+    <button class="copy-btn" onclick="copyCombo()" aria-label="Copy color combination to clipboard">
+      <i class="ti ti-copy" aria-hidden="true"></i> copy
+    </button>
+  </div>
+
+  <footer>
+    Built for Windows accessibility · WCAG 2.1 contrast calculations · Works in all modern browsers
+  </footer>
+</div>
+
+<script>
+const CONDITIONS = {
+  low_vision_general:{note:"<strong>Low vision (general):</strong> High contrast with maximum brightness difference is key. Black backgrounds reduce glare. Yellow or white text on black is the gold standard.",combos:[{name:"Yellow on black",fg:"#FFFF00",bg:"#000000"},{name:"White on black",fg:"#FFFFFF",bg:"#000000"},{name:"Black on white",fg:"#000000",bg:"#FFFFFF"},{name:"Cyan on black",fg:"#00FFFF",bg:"#000000"}]},
+  legal_blind:{note:"<strong>Legal blindness / severe low vision:</strong> Maximum contrast 21:1 is ideal. Pure white on pure black or vice versa. Avoid mid-tones entirely.",combos:[{name:"White on black",fg:"#FFFFFF",bg:"#000000"},{name:"Black on white",fg:"#000000",bg:"#FFFFFF"},{name:"Yellow on black",fg:"#FFFF00",bg:"#000000"},{name:"Lime on black",fg:"#00FF00",bg:"#000000"}]},
+  macular_degen:{note:"<strong>Macular degeneration:</strong> Central vision is impaired. High contrast helps and avoiding fine detail in the center. Black backgrounds reduce eye strain.",combos:[{name:"Yellow on black",fg:"#FFFF00",bg:"#000000"},{name:"White on black",fg:"#FFFFFF",bg:"#000000"},{name:"Cyan on black",fg:"#00FFFF",bg:"#000000"},{name:"White on dark blue",fg:"#FFFFFF",bg:"#00008B"}]},
+  glaucoma:{note:"<strong>Glaucoma:</strong> Peripheral vision is reduced. Bright, high-contrast text on dark backgrounds helps. Avoid bright white backgrounds which can cause glare.",combos:[{name:"White on black",fg:"#FFFFFF",bg:"#000000"},{name:"Yellow on black",fg:"#FFFF00",bg:"#000000"},{name:"White on navy",fg:"#FFFFFF",bg:"#003366"},{name:"Lime on black",fg:"#00FF00",bg:"#000000"}]},
+  diabetic_retino:{note:"<strong>Diabetic retinopathy:</strong> Patchy vision loss and reduced contrast sensitivity. Very high contrast ratios (10:1+) and large text are recommended.",combos:[{name:"White on black",fg:"#FFFFFF",bg:"#000000"},{name:"Yellow on black",fg:"#FFFF00",bg:"#000000"},{name:"Black on yellow",fg:"#000000",bg:"#FFFF00"},{name:"Black on white",fg:"#000000",bg:"#FFFFFF"}]},
+  cataracts:{note:"<strong>Cataracts:</strong> Vision appears cloudy and yellowed. Blue-tinted backgrounds may appear gray. High contrast with warm-colored text on dark backgrounds works well.",combos:[{name:"Yellow on black",fg:"#FFFF00",bg:"#000000"},{name:"White on black",fg:"#FFFFFF",bg:"#000000"},{name:"Orange on black",fg:"#FF8C00",bg:"#000000"},{name:"Black on white",fg:"#000000",bg:"#FFFFFF"}]},
+  nystagmus:{note:"<strong>Nystagmus:</strong> Involuntary eye movement makes tracking text difficult. Dark backgrounds with high-contrast text reduce eye fatigue. Avoid white backgrounds.",combos:[{name:"White on black",fg:"#FFFFFF",bg:"#000000"},{name:"Yellow on black",fg:"#FFFF00",bg:"#000000"},{name:"Cyan on black",fg:"#00FFFF",bg:"#000000"},{name:"White on dark teal",fg:"#FFFFFF",bg:"#004040"}]},
+  protanopia:{note:"<strong>Protanopia (red-blind):</strong> Reds and greens appear similar. Avoid red/green combinations. Blue-yellow contrast is perceived well. Dark backgrounds help.",combos:[{name:"Yellow on black",fg:"#FFFF00",bg:"#000000"},{name:"Cyan on black",fg:"#00FFFF",bg:"#000000"},{name:"White on navy",fg:"#FFFFFF",bg:"#00008B"},{name:"Black on yellow",fg:"#000000",bg:"#FFFF00"}]},
+  deuteranopia:{note:"<strong>Deuteranopia (green-blind):</strong> Green and red look alike. Blue and yellow are the safest pair. Avoid any color coding that relies on red vs. green.",combos:[{name:"Yellow on black",fg:"#FFFF00",bg:"#000000"},{name:"Blue on white",fg:"#0000CD",bg:"#FFFFFF"},{name:"White on navy",fg:"#FFFFFF",bg:"#00008B"},{name:"Black on yellow",fg:"#000000",bg:"#FFFF00"}]},
+  tritanopia:{note:"<strong>Tritanopia (blue-blind):</strong> Blue and yellow appear similar. Use red-white or black-white contrast. Avoid blue text on dark or black backgrounds.",combos:[{name:"White on black",fg:"#FFFFFF",bg:"#000000"},{name:"Black on white",fg:"#000000",bg:"#FFFFFF"},{name:"Red on white",fg:"#CC0000",bg:"#FFFFFF"},{name:"Black on orange",fg:"#000000",bg:"#FF8C00"}]},
+  achromatopsia:{note:"<strong>Achromatopsia (total color blindness):</strong> Only brightness and contrast matter — all color is invisible. Pure black on white or white on black at maximum contrast is best.",combos:[{name:"White on black",fg:"#FFFFFF",bg:"#000000"},{name:"Black on white",fg:"#000000",bg:"#FFFFFF"},{name:"Light gray on black",fg:"#DDDDDD",bg:"#000000"},{name:"Black on light gray",fg:"#000000",bg:"#DDDDDD"}]},
+  photophobia:{note:"<strong>Photophobia (light sensitivity):</strong> Bright screens are painful. Use dark backgrounds with softer (not pure white) text. Avoid white or very bright backgrounds entirely.",combos:[{name:"Soft white on black",fg:"#E8E8E8",bg:"#000000"},{name:"Yellow on dark gray",fg:"#FFFF00",bg:"#1A1A1A"},{name:"Cyan on dark",fg:"#00FFFF",bg:"#0A0A0A"},{name:"Light green on black",fg:"#90EE90",bg:"#000000"}]},
+  albinism:{note:"<strong>Albinism:</strong> Associated with photophobia and reduced visual acuity. Dark mode is essential. Avoid all bright or white backgrounds. High contrast on very dark backgrounds.",combos:[{name:"Yellow on black",fg:"#FFFF00",bg:"#000000"},{name:"Soft white on black",fg:"#E0E0E0",bg:"#000000"},{name:"Cyan on black",fg:"#00FFFF",bg:"#000000"},{name:"Lime on black",fg:"#00FF00",bg:"#000000"}]},
+  retinitis_pig:{note:"<strong>Retinitis pigmentosa:</strong> Tunnel vision and night blindness. High contrast on dark backgrounds. Bright text in the central field. Avoid dim or low-contrast combinations.",combos:[{name:"White on black",fg:"#FFFFFF",bg:"#000000"},{name:"Yellow on black",fg:"#FFFF00",bg:"#000000"},{name:"Cyan on black",fg:"#00FFFF",bg:"#000000"},{name:"White on dark purple",fg:"#FFFFFF",bg:"#2D0050"}]},
+  hemianopia:{note:"<strong>Hemianopia:</strong> Half the visual field is missing. High contrast text helps the remaining field. Avoid any reliance on color position — maximize contrast everywhere.",combos:[{name:"White on black",fg:"#FFFFFF",bg:"#000000"},{name:"Yellow on black",fg:"#FFFF00",bg:"#000000"},{name:"Black on white",fg:"#000000",bg:"#FFFFFF"},{name:"Black on yellow",fg:"#000000",bg:"#FFFF00"}]},
+  keratoconus:{note:"<strong>Keratoconus:</strong> Distorted, blurry vision due to corneal shape. High contrast helps. Dark backgrounds reduce glare and halos from light scatter.",combos:[{name:"White on black",fg:"#FFFFFF",bg:"#000000"},{name:"Yellow on black",fg:"#FFFF00",bg:"#000000"},{name:"White on dark navy",fg:"#FFFFFF",bg:"#001133"},{name:"Cyan on black",fg:"#00FFFF",bg:"#000000"}]},
+};
+
+function hexToRgb(hex){hex=hex.replace('#','');if(hex.length===3)hex=hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];const n=parseInt(hex,16);return{r:(n>>16)&255,g:(n>>8)&255,b:n&255};}
+function rgbToHex(r,g,b){return'#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('').toUpperCase();}
+function relativeLum(r,g,b){return[r,g,b].map(c=>{c/=255;return c<=0.04045?c/12.92:Math.pow((c+0.055)/1.055,2.4)}).reduce((a,c,i)=>a+c*[0.2126,0.7152,0.0722][i],0);}
+function contrastRatio(fg,bg){const L1=relativeLum(fg.r,fg.g,fg.b),L2=relativeLum(bg.r,bg.g,bg.b),lo=Math.min(L1,L2),hi=Math.max(L1,L2);return(hi+0.05)/(lo+0.05);}
+
+let fgRgb={r:255,g:255,b:255},bgRgb={r:0,g:0,b:0};
+
+function update(){
+  const ratio=contrastRatio(fgRgb,bgRgb);
+  const fh=rgbToHex(fgRgb.r,fgRgb.g,fgRgb.b),bh=rgbToHex(bgRgb.r,bgRgb.g,bgRgb.b);
+  document.getElementById('previewBox').style.background=bh;
+  document.getElementById('previewText').style.color=fh;
+  document.getElementById('previewSmall').style.color=fh;
+  document.getElementById('fgSwatch').style.background=fh;
+  document.getElementById('bgSwatch').style.background=bh;
+  document.getElementById('ratioDisplay').textContent=ratio.toFixed(2)+':1';
+  const pills=document.getElementById('pillsArea');
+  let desc='',ph='';
+  if(ratio>=7){desc='AAA — excellent for all users';ph='<span class="badge-pill pass">AAA large</span><span class="badge-pill pass">AAA normal</span>';}
+  else if(ratio>=4.5){desc='AA — good for most users';ph='<span class="badge-pill pass">AA large</span><span class="badge-pill pass">AA normal</span>';}
+  else if(ratio>=3){desc='AA large text only';ph='<span class="badge-pill pass">AA large</span><span class="badge-pill fail">AA normal ✗</span>';}
+  else{desc='Insufficient contrast';ph='<span class="badge-pill fail">Fails WCAG</span>';}
+  pills.innerHTML=ph;
+  document.getElementById('ratioDesc').textContent=desc;
+  const levels=[{title:'AA normal text',req:'≥ 4.5:1',pass:ratio>=4.5},{title:'AA large text (18pt+)',req:'≥ 3:1',pass:ratio>=3},{title:'AAA normal text',req:'≥ 7:1',pass:ratio>=7},{title:'AAA large text',req:'≥ 4.5:1',pass:ratio>=4.5}];
+  document.getElementById('levelsRow').innerHTML=levels.map(l=>`<div class="level-card"><div class="lvl-title">${l.title}</div><div class="lvl-req">${l.req}</div><div class="lvl-status ${l.pass?'pass':'fail'}">${l.pass?'✓ pass':'✗ fail'}</div></div>`).join('');
+  document.getElementById('colorCombo').textContent=`Text: ${fh}  •  Background: ${bh}`;
+}
+
+function applyColor(fg,bg){
+  fgRgb=hexToRgb(fg);bgRgb=hexToRgb(bg);
+  document.getElementById('fgHex').value=fg;document.getElementById('bgHex').value=bg;
+  document.getElementById('fgPicker').value=fg;document.getElementById('bgPicker').value=bg;
+  ['R','G','B'].forEach(c=>{
+    document.getElementById('fg'+c).value=fgRgb[c.toLowerCase()];
+    document.getElementById('fg'+c+'v').textContent=fgRgb[c.toLowerCase()];
+    document.getElementById('bg'+c).value=bgRgb[c.toLowerCase()];
+    document.getElementById('bg'+c+'v').textContent=bgRgb[c.toLowerCase()];
+  });
+  update();
+}
+
+document.getElementById('conditionSelect').addEventListener('change',function(){
+  const val=this.value;
+  const note=document.getElementById('conditionNote');
+  const pills=document.getElementById('conditionPills');
+  if(!val){note.style.display='none';pills.innerHTML='';return;}
+  const cond=CONDITIONS[val];
+  note.style.display='block';
+  note.innerHTML=cond.note;
+  pills.innerHTML='';
+  cond.combos.forEach((c,i)=>{
+    const fg=hexToRgb(c.fg),bg=hexToRgb(c.bg),r=contrastRatio(fg,bg).toFixed(1);
+    const btn=document.createElement('button');
+    btn.className='cpill'+(i===0?' active':'');
+    btn.setAttribute('aria-label',`${c.name}, ${r}:1 contrast ratio`);
+    btn.innerHTML=`<span class="cpill-swatch" style="background:${c.bg};color:${c.fg};">${c.name.split(' ')[0]}</span><span style="font-size:12px;">${c.name}</span><span class="cpill-ratio">${r}:1</span>`;
+    btn.onclick=()=>{
+      document.querySelectorAll('.cpill').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      applyColor(c.fg,c.bg);
+    };
+    pills.appendChild(btn);
+  });
+  applyColor(cond.combos[0].fg,cond.combos[0].bg);
+});
+
+function syncFg(){const h=document.getElementById('fgHex').value;if(!/^#[0-9A-Fa-f]{6}$/.test(h))return;fgRgb=hexToRgb(h);['R','G','B'].forEach(c=>{document.getElementById('fg'+c).value=fgRgb[c.toLowerCase()];document.getElementById('fg'+c+'v').textContent=fgRgb[c.toLowerCase()];});document.getElementById('fgPicker').value=h;update();}
+function syncBg(){const h=document.getElementById('bgHex').value;if(!/^#[0-9A-Fa-f]{6}$/.test(h))return;bgRgb=hexToRgb(h);['R','G','B'].forEach(c=>{document.getElementById('bg'+c).value=bgRgb[c.toLowerCase()];document.getElementById('bg'+c+'v').textContent=bgRgb[c.toLowerCase()];});document.getElementById('bgPicker').value=h;update();}
+
+['fgR','fgG','fgB'].forEach(id=>{document.getElementById(id).addEventListener('input',()=>{fgRgb={r:+document.getElementById('fgR').value,g:+document.getElementById('fgG').value,b:+document.getElementById('fgB').value};['R','G','B'].forEach(c=>{document.getElementById('fg'+c+'v').textContent=fgRgb[c.toLowerCase()];});const h=rgbToHex(fgRgb.r,fgRgb.g,fgRgb.b);document.getElementById('fgHex').value=h;document.getElementById('fgPicker').value=h;update();});});
+['bgR','bgG','bgB'].forEach(id=>{document.getElementById(id).addEventListener('input',()=>{bgRgb={r:+document.getElementById('bgR').value,g:+document.getElementById('bgG').value,b:+document.getElementById('bgB').value};['R','G','B'].forEach(c=>{document.getElementById('bg'+c+'v').textContent=bgRgb[c.toLowerCase()];});const h=rgbToHex(bgRgb.r,bgRgb.g,bgRgb.b);document.getElementById('bgHex').value=h;document.getElementById('bgPicker').value=h;update();});});
+document.getElementById('fgHex').addEventListener('input',syncFg);
+document.getElementById('bgHex').addEventListener('input',syncBg);
+document.getElementById('fgPicker').addEventListener('input',function(){document.getElementById('fgHex').value=this.value.toUpperCase();syncFg();});
+document.getElementById('bgPicker').addEventListener('input',function(){document.getElementById('bgHex').value=this.value.toUpperCase();syncBg();});
+
+function copyCombo(){const text=document.getElementById('colorCombo').textContent;navigator.clipboard.writeText(text).catch(()=>{});const btn=document.querySelector('.copy-btn');btn.innerHTML='<i class="ti ti-check"></i> copied';setTimeout(()=>{btn.innerHTML='<i class="ti ti-copy"></i> copy';},1500);}
+
+update();
+</script>
+</body>
+</html>
